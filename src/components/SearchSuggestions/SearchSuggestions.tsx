@@ -1,5 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useClickOutside } from "../../hooks";
+import { PokemonName } from "../../types";
+
+interface SearchSuggestionsProps {
+  items: PokemonName[];
+  placeholder: string;
+  value: string;
+  onChange: (arg: string) => void;
+  getItemKey: (item: PokemonName) => PokemonName["id"];
+  getItemValue: (item: PokemonName) => PokemonName["name"];
+  onBlur: (arg: string) => void;
+}
 
 function SearchSuggestions({
   placeholder,
@@ -8,16 +19,18 @@ function SearchSuggestions({
   items,
   getItemKey,
   getItemValue,
-  onBlur = () => {},
-}) {
+  onBlur,
+}: SearchSuggestionsProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const focusRef = useClickOutside(() => setShowSuggestions(false));
+  const focusRef = useClickOutside<HTMLDivElement>(() =>
+    setShowSuggestions(false)
+  );
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
 
-  const handleItemSelect = (item) => {
+  const handleItemSelect = (item: PokemonName) => {
     const itemValue = getItemValue(item);
     setShowSuggestions(false);
     onChange(itemValue);

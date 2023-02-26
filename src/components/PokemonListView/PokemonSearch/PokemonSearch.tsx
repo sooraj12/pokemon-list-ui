@@ -17,7 +17,7 @@ function PokemonSearch() {
     fetchNames(searchTerm);
   }, [searchTerm, fetchNames]);
 
-  const handleRecentSelect = (term) => {
+  const handleRecentSelect = (term: string) => {
     // set recent if term length is more than 2
     if (term && term.length > 2) {
       setRecentKeyword(term);

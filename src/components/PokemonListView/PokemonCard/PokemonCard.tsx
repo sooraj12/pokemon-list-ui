@@ -1,22 +1,34 @@
-function PokemonCard({ style, pokemon }) {
-  const statsToShow = ["hp", "speed", "attack", "defense"];
+import { Pokemon } from "../../../types";
 
-  const getSpriteUrl = (id) => {
+function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
+  const statsToShow = ["hp", "speed", "attack", "defense"];
+  console.log(pokemon);
+
+  const getSpriteUrl = (id: number) => {
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
   };
 
-  const getStat = (statType) => {
+  const getStat = (statType: string) => {
     return pokemon.pokemon_v2_pokemonstats.find(({ pokemon_v2_stat }) => {
       return pokemon_v2_stat.name === statType;
     })?.base_stat;
   };
 
   const getStats = () => {
-    return statsToShow.reduce((acc, cur) => {
-      const stat = cur;
-      const statValue = getStat(cur);
-      return [...acc, { name: stat, value: statValue }];
-    }, []);
+    return statsToShow.reduce(
+      (
+        acc: {
+          name: string;
+          value: number | undefined;
+        }[],
+        cur: string
+      ) => {
+        const stat = cur;
+        const statValue = getStat(cur);
+        return [...acc, { name: stat, value: statValue }];
+      },
+      []
+    );
   };
 
   const renderTypes = () => {
@@ -49,7 +61,7 @@ function PokemonCard({ style, pokemon }) {
   };
 
   return (
-    <div className="w-full sm:w-1/2 md:w-1/2 xl:w-1/4 p-2" style={style}>
+    <div className="w-full sm:w-1/2 md:w-1/2 xl:w-1/4 p-2">
       <div className="c-card block bg-white shadow-md hover:shadow-xl rounded-lg overflow-hidden">
         <div className="relative pb-48 overflow-hidden">
           <img

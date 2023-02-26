@@ -1,15 +1,17 @@
 import { useEffect, useRef } from "react";
 
-function useClickOutside(handler) {
-  const elRef = useRef();
-  const handlerRef = useRef();
+function useClickOutside<T extends HTMLElement>(
+  handler: (args: Event) => void
+) {
+  const elRef = useRef<T>(null);
+  const handlerRef = useRef<typeof handler>();
   handlerRef.current = handler;
 
   useEffect(() => {
-    const listener = (event) => {
+    const listener: EventListener = (event) => {
       if (
         elRef.current &&
-        !elRef.current.contains(event.target) &&
+        !elRef.current.contains(event.target as Node) &&
         handlerRef.current
       ) {
         handlerRef.current(event);

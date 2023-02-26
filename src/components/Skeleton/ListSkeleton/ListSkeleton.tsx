@@ -1,6 +1,6 @@
 import { Skeleton } from "../Skeleton";
 
-function ListSkeleton({ count }) {
+function ListSkeleton({ count }: { count: number }) {
   const renderTypes = () => {
     const types = [...Array(2)];
 

@@ -1,21 +1,21 @@
 import { useEffect } from "react";
-import { FixedSizeGrid as Grid } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
-import InfiniteLoader from "react-window-infinite-loader";
+// import { FixedSizeGrid as Grid } from "react-window";
+// import AutoSizer from "react-virtualized-auto-sizer";
+// import InfiniteLoader from "react-window-infinite-loader";
 import InfiniteScroll from "react-infinite-scroller";
 
 import { PokemonCard } from "../PokemonCard";
 import { usePokemonListProvider } from "../../../hooks";
 import { ListSkeleton } from "../../Skeleton";
 
-const noOfColumns = 4;
-const cardHeight = 510;
+// const noOfColumns = 4;
+// const cardHeight = 510;
 
 function PokemonList() {
   const { searchTerm, fetchList, updateListItems, list } =
     usePokemonListProvider();
 
-  const rowCount = Math.ceil(list.data.length / noOfColumns);
+  // const rowCount = Math.ceil(list.data.length / noOfColumns);
 
   useEffect(() => {
     fetchList(searchTerm);

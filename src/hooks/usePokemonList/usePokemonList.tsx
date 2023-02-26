@@ -1,7 +1,13 @@
-import { useCallback, useReducer } from "react";
+import { Reducer, useCallback, useReducer } from "react";
 import axios from "axios";
 
 import { storage } from "../../utils";
+import {
+  Pokemon,
+  PokemonMessages,
+  PokemonName,
+  PokemonState,
+} from "../../types";
 
 const endPoint = "https://beta.pokeapi.co/graphql/v1beta";
 const axiosInstance = axios.create({
@@ -13,32 +19,19 @@ const recentsStorage = storage("recents");
 const namesLimit = 10;
 const cardsLimit = 25;
 
-const ACTIONS = {
-  set_search_term: "set_search_term",
-  set_recent_search: "set_recent_search",
-  set_names: "set_names",
-
-  // list actions
-  set_list_loading: "set_list_loading",
-  set_list: "set_list",
-  update_list: "update_list",
-  set_pIndex: "set_pIndex",
-  set_has_more: "set_has_more",
-};
-
-const reducer = (state, action) => {
+const reducer = (state: PokemonState, action: PokemonMessages) => {
   switch (action.type) {
-    case ACTIONS.set_search_term:
+    case "set_search_term":
       return {
         ...state,
         searchTerm: action.data,
       };
-    case ACTIONS.set_names:
+    case "set_names":
       return {
         ...state,
         names: [...action.data],
       };
-    case ACTIONS.set_recent_search:
+    case "set_recent_search":
       let newRecents = [];
       if (state.recents.includes(action.data)) {
         newRecents = state.recents;
@@ -55,7 +48,7 @@ const reducer = (state, action) => {
         ...state,
         recents: newRecents,
       };
-    case ACTIONS.set_list_loading:
+    case "set_list_loading":
       return {
         ...state,
         list: {
@@ -63,7 +56,7 @@ const reducer = (state, action) => {
           isLoading: action.data,
         },
       };
-    case ACTIONS.set_list:
+    case "set_list":
       return {
         ...state,
         list: {
@@ -71,7 +64,7 @@ const reducer = (state, action) => {
           data: [...action.data],
         },
       };
-    case ACTIONS.update_list:
+    case "update_list":
       return {
         ...state,
         list: {
@@ -79,7 +72,7 @@ const reducer = (state, action) => {
           data: [...state.list.data, ...action.data],
         },
       };
-    case ACTIONS.set_pIndex:
+    case "set_pIndex":
       return {
         ...state,
         list: {
@@ -87,7 +80,7 @@ const reducer = (state, action) => {
           pIndex: action.data,
         },
       };
-    case ACTIONS.set_has_more:
+    case "set_has_more":
       return {
         ...state,
         list: {
@@ -100,7 +93,7 @@ const reducer = (state, action) => {
   }
 };
 
-function init(initialState) {
+function init(initialState: PokemonState): PokemonState {
   const recents = recentsStorage.getItem();
   return {
     ...initialState,
@@ -109,7 +102,7 @@ function init(initialState) {
 }
 
 function usePokemonList() {
-  const INITIAL_STATE = {
+  const INITIAL_STATE: PokemonState = {
     searchTerm: "",
     // can store upto 3 recent searches
     recents: [],
@@ -122,44 +115,47 @@ function usePokemonList() {
     },
   };
 
-  const [state, setState] = useReducer(reducer, INITIAL_STATE, init);
+  const [state, setState] = useReducer<
+    Reducer<PokemonState, PokemonMessages>,
+    PokemonState
+  >(reducer, INITIAL_STATE, init);
 
   //   set search term
-  const sestSearchTerm = (term) => {
-    setState({ type: ACTIONS.set_search_term, data: term });
+  const sestSearchTerm = (term: string) => {
+    setState({ type: "set_search_term", data: term });
   };
 
   // set recent search keyword
-  const setRecentKeyword = (keyword) => {
-    setState({ type: ACTIONS.set_recent_search, data: keyword });
+  const setRecentKeyword = (keyword: string) => {
+    setState({ type: "set_recent_search", data: keyword });
   };
 
   // set names for auto suggest
-  const setNames = (names) => {
-    setState({ type: ACTIONS.set_names, data: names });
+  const setNames = (names: PokemonName[]) => {
+    setState({ type: "set_names", data: names });
   };
 
-  const setListLoading = (isLoading) => {
-    setState({ type: ACTIONS.set_list_loading, data: isLoading });
+  const setListLoading = (isLoading: boolean) => {
+    setState({ type: "set_list_loading", data: isLoading });
   };
 
-  const setList = (data) => {
-    setState({ type: ACTIONS.set_list, data });
+  const setList = (data: Pokemon[]) => {
+    setState({ type: "set_list", data });
   };
 
-  const updateList = (data) => {
-    setState({ type: ACTIONS.update_list, data });
+  const updateList = (data: Pokemon[]) => {
+    setState({ type: "update_list", data });
   };
 
-  const setPindex = (index) => {
-    setState({ type: ACTIONS.set_pIndex, data: index });
+  const setPindex = (index: number) => {
+    setState({ type: "set_pIndex", data: index });
   };
 
-  const setHasMore = (hasMore) => {
-    setState({ type: ACTIONS.set_has_more, data: hasMore });
+  const setHasMore = (hasMore: boolean) => {
+    setState({ type: "set_has_more", data: hasMore });
   };
 
-  const getNamesQuery = (prefix) => {
+  const getNamesQuery = (prefix: string) => {
     return `query fetchNames {
       pokemon_v2_pokemon(where: {name: {_regex: ${prefix}}}, limit: ${namesLimit}, offset: 0) {
         id,
@@ -168,7 +164,7 @@ function usePokemonList() {
     }`;
   };
 
-  const fetchNames = useCallback((searchTerm) => {
+  const fetchNames = useCallback((searchTerm: string) => {
     if (searchTerm) {
       axiosInstance({
         data: {
@@ -185,7 +181,7 @@ function usePokemonList() {
     }
   }, []);
 
-  const getListQuery = (prefix, offset) => {
+  const getListQuery = (prefix: string, offset: number) => {
     if (!prefix) {
       return `query fetchList {
         pokemon_v2_pokemon(limit: ${cardsLimit}, offset: ${offset}) {
@@ -229,7 +225,7 @@ function usePokemonList() {
     `;
   };
 
-  const setListParams = (list) => {
+  const setListParams = (list: Pokemon[]) => {
     if (list.length < cardsLimit) {
       setHasMore(false);
     } else {
@@ -238,7 +234,7 @@ function usePokemonList() {
     }
   };
 
-  const fetchList = useCallback((prefix) => {
+  const fetchList = useCallback((prefix: string) => {
     setListLoading(true);
     const query = getListQuery(prefix, 0);
     axiosInstance({
@@ -257,7 +253,7 @@ function usePokemonList() {
       });
   }, []); // eslint-disable-line
 
-  const updateListItems = (prefix, page) => {
+  const updateListItems = (prefix: string, page: number) => {
     const query = getListQuery(prefix, page);
     axiosInstance({
       data: {
